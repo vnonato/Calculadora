@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora de Marketplaces - POCENI</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+
+  <!-- Fonte Inter do Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Arquivo de estilo CSS -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Biblioteca Inputmask para máscaras -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/5.0.6-beta.14/inputmask.min.js" defer></script>
+
+  <!-- Arquivo JS com lógica da calculadora -->
+  <script src="script.js" defer></script>
+</head>
+<body>
+
+  <header class="header">
+    <div class="logo-container">
+      <img src="logo.png" alt="Logo Poceni" class="logo-img" />
+    </div>
+  </header>
+
+  <div class="modo-calculo-container">
+    <select id="modoCalculo">
+      <option value="lucro-para-venda">Calcular Preço de Venda a partir do Lucro</option>
+      <option value="venda-para-lucro">Calcular Lucro a partir do Preço de Venda</option>
+    </select>
+  </div>
+
+  <section class="card destaque-topo" id="card-valor-venda" style="display: none;">
+    <h2 id="resultado-titulo">Preço de Venda</h2>
+    <p class="result destaque">
+  </section>
+
+  <main class="container">
+    <section class="card" id="card-entradas">
+      <h2>Entradas</h2>
+      <form id="calcForm">
+        <div class="input-group">
+          <label for="valorCompra">Custo do produto:</label>
+          <input type="text" id="valorCompra" required />
+        </div>
+
+        <div class="input-group" id="grupo-tipo-lucro">
+          <label for="tipoLucro">Tipo de lucro:</label>
+          <select id="tipoLucro">
+            <option value="percentual">Lucro em %</option>
+            <option value="absoluto">Lucro em R$</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label for="lucroDesejado" id="label-lucro-desejado">Lucro desejado:</label>
+          <input type="text" id="lucroDesejado" required />
+        </div>
+
+        <div class="input-group">
+          <label for="marketplace">Marketplace:</label>
+          <select id="marketplace">
+            <option value="mercadolivre">Mercado Livre</option>
+            <option value="shopee">Shopee</option>
+            <option value="amazon">Amazon</option>
+            <option value="tiktokshop">TikTok Shop</option>
+            <option value="magalu">Magalu</option>
+            <option value="todos">Comparar Todos</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label for="custoOperacional">Custo Operacional:</label>
+          <input type="text" id="custoOperacional" required />
+          <small class="input-help">Embalagem, frete, mão de obra, etc.</small>
+        </div>
+
+        <div class="input-group">
+          <label for="custosExtras">Custos Extras:</label>
+          <input type="text" id="custosExtras" required />
+          <small class="input-help">Outros custos não incluídos acima</small>
+        </div>
+        <div id="feedback" class="feedback"></div>
+      </form>
+    </section>
+
+    <section class="card" id="card-tributos">
+      <h2>Tributos</h2>
+      <h3>PIS/COFINS</h3>
+      <div class="checkbox-group">
+        <input type="checkbox" id="pisCofinsMonofasico" />
+        <label for="pisCofinsMonofasico">Monofásico</label>
+        <div class="tooltip">
+          <span class="tooltip-icon">?</span>
+          <span class="tooltip-text">Produtos com tributação monofásica não têm incidência de PIS/COFINS nas etapas seguintes.</span>
+        </div>
+      </div>
+      <div class="checkbox-group">
+        <input type="checkbox" id="pisCofinsCredito" />
+        <label for="pisCofinsCredito">Crédito sobre custo (9,25%)</label>
+        <div class="tooltip">
+          <span class="tooltip-icon">?</span>
+          <span class="tooltip-text">Permite aproveitar crédito de PIS/COFINS sobre o valor de compra.</span>
+        </div>
+      </div>
+      <div class="checkbox-group">
+        <input type="checkbox" id="pisCofinsDebito" />
+        <label for="pisCofinsDebito">Débito sobre receita (9,25%)</label>
+        <div class="tooltip">
+          <span class="tooltip-icon">?</span>
+          <span class="tooltip-text">Aplica débito de PIS/COFINS sobre o valor de venda.</span>
+        </div>
+      </div>
+      
+      <h3>ICMS</h3>
+      <div class="checkbox-group">
+        <input type="checkbox" id="icmsST" />
+        <label for="icmsST">ICMS-ST incluso no custo</label>
+        <div class="tooltip">
+          <span class="tooltip-icon">?</span>
+          <span class="tooltip-text">Quando o ICMS por Substituição Tributária já está incluído no custo do produto.</span>
+        </div>
+      </div>
+      <div class="checkbox-group">
+        <input type="checkbox" id="icmsProprio" />
+        <label for="icmsProprio">ICMS a recolher (18%)</label>
+        <div class="tooltip">
+          <span class="tooltip-icon">?</span>
+          <span class="tooltip-text">Aplica débito de ICMS sobre o valor de venda.</span>
+        </div>
+      </div>
+      <div class="checkbox-group">
+        <input type="checkbox" id="icmsCredito" />
+        <label for="icmsCredito">Creditar ICMS da compra (18%)</label>
+        <div class="tooltip">
+          <span class="tooltip-icon">?</span>
+          <span class="tooltip-text">Permite aproveitar crédito de ICMS sobre o valor de compra.</span>
+        </div>
+      </div>
+      
+      <h3>DIFAL</h3>
+      <div class="checkbox-group">
+        <input type="checkbox" id="aplicarDifal" />
+        <label for="aplicarDifal">Aplicar DIFAL</label>
+        <div class="tooltip">
+          <span class="tooltip-icon">?</span>
+          <span class="tooltip-text">Diferencial de Alíquota para vendas interestaduais.</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label for="estadoOrigem">Origem:</label>
+        <select id="estadoOrigem">
+          <option value="AC">AC - Acre</option>
+          <option value="AL">AL - Alagoas</option>
+          <option value="AP">AP - Amapá</option>
+          <option value="AM">AM - Amazonas</option>
+          <option value="BA">BA - Bahia</option>
+          <option value="CE">CE - Ceará</option>
+          <option value="DF">DF - Distrito Federal</option>
+          <option value="ES">ES - Espírito Santo</option>
+          <option value="GO">GO - Goiás</option>
+          <option value="MA">MA - Maranhão</option>
+          <option value="MT">MT - Mato Grosso</option>
+          <option value="MS">MS - Mato Grosso do Sul</option>
+          <option value="MG">MG - Minas Gerais</option>
+          <option value="PA">PA - Pará</option>
+          <option value="PB">PB - Paraíba</option>
+          <option value="PR">PR - Paraná</option>
+          <option value="PE">PE - Pernambuco</option>
+          <option value="PI">PI - Piauí</option>
+          <option value="RJ">RJ - Rio de Janeiro</option>
+          <option value="RN">RN - Rio Grande do Norte</option>
+          <option value="RS">RS - Rio Grande do Sul</option>
+          <option value="RO">RO - Rondônia</option>
+          <option value="RR">RR - Roraima</option>
+          <option value="SC">SC - Santa Catarina</option>
+          <option value="SP">SP - São Paulo</option>
+          <option value="SE">SE - Sergipe</option>
+          <option value="TO">TO - Tocantins</option>
+        </select>
+        <span class="dest-info">(destino fixo: SP)</span>
+      </div>
+    </section>
+
+    <section class="card" id="card-tarifas">
+      <h2>Tarifas</h2>
+      <div id="marketplace-logo-container" class="marketplace-logo-container">
+        <!-- Logos dos marketplaces serão inseridos aqui dinamicamente -->
+      </div>
+      <div id="tarifas-container">
+        <p>Tarifa fixa: <span id="tarifaFixa"></span></p>
+        <p>Tarifa sobre venda: <span id="tarifaExposicao"></span></p>
+        
+        <h3>Tributos</h3>
+        <p>PIS/COFINS: <span id="pisCofins"></span></p>
+        <p>ICMS: <span id="icms"></span></p>
+        <p>DIFAL: <span id="difal"></span></p>
+        <p>IRPJ: <span id="irpj"></span></p>
+        <p>CSLL: <span id="csll"></span></p>
+        
+        <h3>Resumo</h3>
+        <p>Valor de Venda: <span id="precoVenda"></span></p>
+        <p>Lucro líquido: <span id="lucro"></span></p>
+        <p>Margem sobre venda: <span id="lucroSobreVenda"></span></p>
+        <p>Margem sobre custo: <span id="lucroBruto"></span></p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Container para comparação de marketplaces -->
+  <section id="comparacao-container" class="comparacao-container hidden">
+    <h2>Comparação entre Marketplaces</h2>
+    <div class="marketplace-cards">
+      <!-- Cards de comparação serão inseridos aqui dinamicamente -->
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>Calculadora para Marketplaces - Versão 1.0</p>
+  </footer>
+
+</body>
+</html>
